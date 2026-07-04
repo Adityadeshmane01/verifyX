@@ -4,7 +4,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import { nitro } from "nitro/vite";
 import tailwindcss from "@tailwindcss/vite";
 
-const target = process.env.API_URL || "https://verifyx-backend.onrender.com";
+const target = process.env.API_URL || "https://verifyx-backend-hpda.onrender.com";
 
 export default defineConfig({
   plugins: [
