@@ -1,4 +1,5 @@
 import * as tf from "@tensorflow/tfjs";
+import "@tensorflow/tfjs-backend-wasm";
 import faceapi from "@vladmandic/face-api/dist/face-api.node-wasm.js";
 import Jimp from "jimp";
 import { createWorker } from "tesseract.js";
@@ -11,8 +12,14 @@ export async function loadModels() {
   try {
     console.log("Initializing TensorFlow and face-api models...");
     
-    // Set backend to pure JS CPU to avoid Windows compilation issues
-    await tf.setBackend("cpu");
+    // Use WebAssembly (WASM) backend for high-performance CPU execution (works on Windows & Linux)
+    try {
+      console.log("Setting TensorFlow backend to WebAssembly (WASM)...");
+      await tf.setBackend("wasm");
+    } catch (e) {
+      console.warn("WASM backend failed to load, falling back to CPU (slower):", e.message);
+      await tf.setBackend("cpu");
+    }
     await tf.ready();
     
     // Load SSD MobileNet face detector, landmarks, and descriptors with CDN fallback
