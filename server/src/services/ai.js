@@ -15,11 +15,20 @@ export async function loadModels() {
     await tf.setBackend("cpu");
     await tf.ready();
     
-    // Load SSD MobileNet face detector, landmarks, and descriptors
-    const modelUrl = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
-    await faceapi.nets.ssdMobilenetv1.loadFromUri(modelUrl);
-    await faceapi.nets.faceLandmark68Net.loadFromUri(modelUrl);
-    await faceapi.nets.faceRecognitionNet.loadFromUri(modelUrl);
+    // Load SSD MobileNet face detector, landmarks, and descriptors with CDN fallback
+    let modelUrl = "https://unpkg.com/@vladmandic/face-api/model/";
+    try {
+      console.log("Loading models from primary CDN (Unpkg)...");
+      await faceapi.nets.ssdMobilenetv1.loadFromUri(modelUrl);
+      await faceapi.nets.faceLandmark68Net.loadFromUri(modelUrl);
+      await faceapi.nets.faceRecognitionNet.loadFromUri(modelUrl);
+    } catch (err) {
+      console.warn("Primary CDN failed, loading from backup CDN (jsDelivr)... Reason:", err.message);
+      modelUrl = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+      await faceapi.nets.ssdMobilenetv1.loadFromUri(modelUrl);
+      await faceapi.nets.faceLandmark68Net.loadFromUri(modelUrl);
+      await faceapi.nets.faceRecognitionNet.loadFromUri(modelUrl);
+    }
     
     console.log("TensorFlow and face-api models loaded successfully.");
     modelsLoaded = true;
