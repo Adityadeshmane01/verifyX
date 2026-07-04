@@ -1,6 +1,13 @@
 export async function apiFetch(path, options = {}) {
   const isServer = typeof window === "undefined";
-  const baseUrl = isServer ? "http://localhost:5000" : "";
+  
+  // In production SSR, use the configured API_URL; otherwise default to localhost:5000
+  let apiTarget = "http://localhost:5000";
+  if (typeof process !== "undefined" && process.env.API_URL) {
+    apiTarget = process.env.API_URL;
+  }
+  
+  const baseUrl = isServer ? apiTarget : "";
   
   const headers = { ...options.headers };
   if (typeof window !== "undefined" && !(options.body instanceof FormData)) {
